@@ -1,19 +1,16 @@
 name: Windows smoke tests
-on:
-  push:
-  pull_request:
+'on': [push, pull_request, workflow_dispatch]
 permissions:
   contents: read
 jobs:
   test:
     runs-on: windows-latest
-    strategy:
-      matrix:
-        shell: [powershell, pwsh]
     steps:
-      - uses: actions/checkout@v4
-      - name: Check syntax and run smoke tests
-        shell: ${{ matrix.shell }}
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Windows PowerShell 5.1 syntax and smoke tests
+        shell: powershell
         run: |
           $ErrorActionPreference = 'Stop'
           Get-ChildItem -Recurse -Include *.ps1,*.psm1 | ForEach-Object {
@@ -22,4 +19,9 @@ jobs:
             [Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$tokens, [ref]$errors) | Out-Null
             if ($errors.Count) { throw ($errors | Out-String) }
           }
+          & .\tests\Smoke.Tests.ps1
+      - name: PowerShell 7 smoke tests
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
           & .\tests\Smoke.Tests.ps1
