@@ -1,0 +1,9 @@
+*.exe
+*.msi
+*.dat
+*.cab
+*.zip
+*.log
+*.tmp
+.test-work/
+.git/
